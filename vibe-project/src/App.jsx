@@ -1,14 +1,27 @@
-import { useReducer, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { targets, getRank } from './data/targets.js';
 import Header from './components/Header.jsx';
 import Grid from './components/Grid.jsx';
 import Modal from './components/Modal.jsx';
 import Sidebar from './components/Sidebar.jsx';
 
-const initialState = {
-  score: 0,
-  log: []
-};
+/* ------------------------------------------------------------------ */
+/* 1 ·  STATE SHAPES & HELPERS                                         */
+/* ------------------------------------------------------------------ */
+const blankState = { score: 0, log: [] };
+
+function loadSession() {
+  try {
+    const raw = sessionStorage.getItem('smashCounter');
+    return raw ? JSON.parse(raw) : blankState;
+  } catch {
+    return blankState;                 // parse error → start fresh
+  }
+}
+
+function saveSession(state) {
+  sessionStorage.setItem('smashCounter', JSON.stringify(state));
+}
 
 function reducer(state, action) {
   switch (action.type) {
@@ -17,7 +30,7 @@ function reducer(state, action) {
     case 'ADD_LOG':
       return { ...state, log: [...state.log, action.payload] };
     case 'RESET':
-      return initialState;
+      return blankState;
     default:
       return state;
   }
@@ -32,11 +45,17 @@ function formatDTG(d = new Date()) {
   return `${dd}${hh}${mm}${mon}Z${yy}`;
 }
 
+/* ------------------------------------------------------------------ */
+/* 2 ·  MAIN APP                                                       */
+/* ------------------------------------------------------------------ */
 export default function App() {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const [modalImg, setModalImg] = useState(null);
-  const [sidebarOpen, setSidebar] = useState(true);        // default OPEN
+  const [state, dispatch] = useReducer(reducer, undefined, loadSession);
+  const [modalImg, setModalImg]   = useState(null);
 
+  /* persist every change */
+  useEffect(() => saveSession(state), [state]);
+
+  /* helper to log a hit */
   function addLog(platform, result) {
     dispatch({
       type: 'ADD_LOG',
@@ -44,11 +63,8 @@ export default function App() {
     });
   }
 
-  // inside App.jsx render (...)
-return (
-  <>
-    {/* everything that scrolls lives inside .page  */}
-    <div className="page">
+  return (
+    <>
       <Header
         score={state.score}
         rank={getRank(state.score)}
@@ -61,17 +77,9 @@ return (
         onLog={addLog}
         onView={setModalImg}
       />
-    </div>
 
-    {/* fixed log bar */}
-    <Sidebar
-      log={state.log}
-      isOpen={sidebarOpen}
-      toggle={() => setSidebar(!sidebarOpen)}
-    />
-
-    <Modal imgSrc={modalImg} onClose={() => setModalImg(null)} />
-  </>
-);
-
+      <Modal imgSrc={modalImg} onClose={() => setModalImg(null)} />
+      <Sidebar log={state.log} />
+    </>
+  );
 }

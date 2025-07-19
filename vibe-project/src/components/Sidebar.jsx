@@ -1,69 +1,96 @@
-// Sidebar.jsx – v3 (cursor at bottom)
+// Sidebar.jsx – v6 (typing queue, never truncates)
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-export default function Sidebar({ log, isOpen, toggle }) {
-  const [typedLines, setTypedLines] = useState([]);
-  const typingIdx = useRef(0);
+const TYPE_SPEED = 25;         // ms per character
+
+const fmt = ({ dtg, platform, result }) =>
+  `> ${dtg} || <strong>${platform}</strong> || ${result}`;
+
+export default function Sidebar({ log }) {
+  /* rendered HTML strings, newest at index 0 due to column‑reverse */
+  const [lines, setLines] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
 
-  /* typewriter */
-  useEffect(() => {
-    if (!log.length) return;
+  /* mutable refs */
+  const queueRef   = useRef([]);   // pending formatted lines
+  const charIdxRef = useRef(0);
+  const prevLenRef = useRef(0);
+  const timerRef   = useRef(null);
 
-    const newest = log[log.length - 1];
-    const full = `> ${newest.dtg} || ${newest.platform} || ${newest.result}`;
-
-    // prepend blank placeholder for new line
-    setTypedLines(prev => ['', ...prev]);
-    typingIdx.current = 0;
+  /* helper: kick off typing for the next queued line */
+  const startNext = () => {
+    if (!queueRef.current.length) {
+      setIsTyping(false);
+      return;
+    }
+    const full = queueRef.current.shift();
+    charIdxRef.current = 0;
     setIsTyping(true);
+    setLines(prev => ['', ...prev]);          // placeholder line
 
-    const id = setInterval(() => {
-      typingIdx.current += 1;
-      setTypedLines(prev => {
+    timerRef.current = setInterval(() => {
+      charIdxRef.current += 1;
+      setLines(prev => {
         const arr = [...prev];
-        arr[0] = full.slice(0, typingIdx.current);
+        arr[0] = full.slice(0, charIdxRef.current);
         return arr;
       });
-      if (typingIdx.current >= full.length) {
-        clearInterval(id);
-        // bold platform text
-        setTypedLines(prev => {
-          const [first, ...rest] = prev;
-          const bolded = first.replace(
-            newest.platform,
-            `<strong>${newest.platform}</strong>`
-          );
-          return [bolded, ...rest];
+      if (charIdxRef.current >= full.length) {
+        clearInterval(timerRef.current);
+        setLines(prev => {
+          const [_, ...rest] = prev;
+          return [full, ...rest];
         });
-        setIsTyping(false);
+        startNext();                         // recurse for next queued line
       }
-    }, 25);
+    }, TYPE_SPEED);
+  };
 
-    return () => clearInterval(id);
+  /* watch log prop */
+  useEffect(() => {
+    /* RESET */
+    if (log.length === 0) {
+      clearInterval(timerRef.current);
+      setLines([]);
+      queueRef.current = [];
+      prevLenRef.current = 0;
+      setIsTyping(false);
+      return;
+    }
+
+    /* FIRST HYDRATION */
+    if (prevLenRef.current === 0) {
+      setLines([...log].reverse().map(fmt));      // instant dump
+      prevLenRef.current = log.length;
+      return;
+    }
+
+    /* NEW ENTRIES */
+    if (log.length > prevLenRef.current) {
+      const newItems = log.slice(prevLenRef.current).map(fmt);
+      queueRef.current.push(...newItems);         // maintain order
+      prevLenRef.current = log.length;
+      if (!isTyping) startNext();                 // begin if idle
+    }
   }, [log]);
 
-  /* wipe on clear‑all */
-  useEffect(() => {
-    if (log.length === 0) setTypedLines([]);
-  }, [log.length]);
+  /* cleanup on unmount */
+  useEffect(() => () => clearInterval(timerRef.current), []);
 
+  /* render */
   return createPortal(
-    <aside className={`log ${isOpen ? '' : 'closed'}`}>
-      
-
+    <aside className="log">
       <ul className="log__list">
-        {/* cursor FIRST → appears at visual bottom */}
+        {/* cursor bottom‑most */}
         <li className="log__line">
           <span className="log__cursor">{isTyping ? '' : '■'}</span>
         </li>
-
-        {typedLines.map((line, i) => (
+        {lines.map((html, i) => (
           <li
             key={i}
             className="log__line"
-            dangerouslySetInnerHTML={{ __html: line }}
+            dangerouslySetInnerHTML={{ __html: html }}
           />
         ))}
       </ul>
