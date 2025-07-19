@@ -4,9 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 const TYPE_SPEED = 25;
-const fmt = ({ dtg, platform, result }) =>
-  `${dtg} || <strong>${platform}</strong> || ${result}`;  // no leading “>”
+const fmt = ({ dtg, platform, result }) => {
+  const coloured =
+    result === 'K‑Kill'
+      ? '<span class="log-kill--k">K‑Kill</span>'
+      : '<span class="log-kill--m">M‑Kill</span>';
 
+  return `${dtg} || <strong>${platform}</strong> || ${coloured}`;
+};
 
 export default function Sidebar({ log }) {
   const [lines, setLines] = useState([]);     // rendered HTML strings

@@ -158,7 +158,7 @@ h6 {
   margin-bottom: 0.4rem;
 }
 .card__desc {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   margin-bottom: 0.4rem;
 }
 .card__category {
@@ -250,6 +250,11 @@ h6 {
   line-height: 1;                 /* keeps glyph compact */
 }
 
+/* coloured result tags in SMASH LOG */
+.log-kill--k { color: #ff4040; }    /* red for K‑Kill */
+.log-kill--m { color: #ffa500; }    /* orange for M‑Kill */
+
+
 .log__list {
   flex: 1;
   margin: 0;
@@ -260,7 +265,7 @@ h6 {
   gap: 0.25rem;
   overflow-y: auto;
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: #fff;
   letter-spacing: 0.4px;
   overflow-wrap: anywhere;
