@@ -1,19 +1,21 @@
-// src/App.jsx
 import { useReducer, useState } from 'react';
 import { targets, getRank } from './data/targets.js';
 import Header from './components/Header.jsx';
 import Grid from './components/Grid.jsx';
 import Modal from './components/Modal.jsx';
+import Sidebar from './components/Sidebar.jsx';
 
-/* ------------------------------------------------------------------ */
-/*  1.  SCORE STATE                                                   */
-/* ------------------------------------------------------------------ */
-const initialState = { score: 0 };
+const initialState = {
+  score: 0,
+  log: []
+};
 
 function reducer(state, action) {
   switch (action.type) {
     case 'ADD_POINTS':
-      return { score: state.score + action.payload };
+      return { ...state, score: state.score + action.payload };
+    case 'ADD_LOG':
+      return { ...state, log: [...state.log, action.payload] };
     case 'RESET':
       return initialState;
     default:
@@ -21,31 +23,55 @@ function reducer(state, action) {
   }
 }
 
-/* ------------------------------------------------------------------ */
-/*  2.  APP COMPONENT                                                 */
-/* ------------------------------------------------------------------ */
+function formatDTG(d = new Date()) {
+  const dd  = String(d.getUTCDate()).padStart(2, '0');
+  const hh  = String(d.getUTCHours()).padStart(2, '0');
+  const mm  = String(d.getUTCMinutes()).padStart(2, '0');
+  const mon = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][d.getUTCMonth()];
+  const yy  = String(d.getUTCFullYear()).slice(-2);
+  return `${dd}${hh}${mm}${mon}Z${yy}`;
+}
+
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [modalImg, setModalImg] = useState(null);   // for the image viewer
+  const [modalImg, setModalImg] = useState(null);
+  const [sidebarOpen, setSidebar] = useState(true);        // default OPEN
 
-  return (
-    <>
-      {/* header */}
+  function addLog(platform, result) {
+    dispatch({
+      type: 'ADD_LOG',
+      payload: { dtg: formatDTG(), platform, result }
+    });
+  }
+
+  // inside App.jsx render (...)
+return (
+  <>
+    {/* everything that scrolls lives inside .page  */}
+    <div className="page">
       <Header
         score={state.score}
         rank={getRank(state.score)}
         onReset={() => dispatch({ type: 'RESET' })}
       />
 
-      {/* target grid */}
       <Grid
         targets={targets}
         onClick={(xp) => dispatch({ type: 'ADD_POINTS', payload: xp })}
-        onView={setModalImg}                      // pass opener for modal
+        onLog={addLog}
+        onView={setModalImg}
       />
+    </div>
 
-      {/* full‑size image modal */}
-      <Modal imgSrc={modalImg} onClose={() => setModalImg(null)} />
-    </>
-  );
+    {/* fixed log bar */}
+    <Sidebar
+      log={state.log}
+      isOpen={sidebarOpen}
+      toggle={() => setSidebar(!sidebarOpen)}
+    />
+
+    <Modal imgSrc={modalImg} onClose={() => setModalImg(null)} />
+  </>
+);
+
 }

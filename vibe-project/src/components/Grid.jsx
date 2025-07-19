@@ -1,7 +1,7 @@
-// src/components/Grid.jsx
-import TargetCard from './TargetCard.jsx';    // ← MAKE SURE THIS LINE EXISTS
+// Grid.jsx – forwards onLog / onView to each card
+import TargetCard from './TargetCard.jsx';
 
-export default function Grid({ targets, onClick, onView }) {
+export default function Grid({ targets, onClick, onLog, onView }) {
   return (
     <section className="grid">
       {targets.map((t) => (
@@ -9,7 +9,8 @@ export default function Grid({ targets, onClick, onView }) {
           key={t.id}
           data={t}
           onClick={onClick}
-          onView={onView}
+          onLog={onLog}     // NEW
+          onView={onView}   // (modal zoom)
         />
       ))}
     </section>
