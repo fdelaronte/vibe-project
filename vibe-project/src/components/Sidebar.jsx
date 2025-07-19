@@ -51,9 +51,7 @@ export default function Sidebar({ log, isOpen, toggle }) {
 
   return createPortal(
     <aside className={`log ${isOpen ? '' : 'closed'}`}>
-      <button className="log__toggle" onClick={toggle}>
-        {isOpen ? '<' : '>'}
-      </button>
+      
 
       <ul className="log__list">
         {/* cursor FIRST → appears at visual bottom */}
