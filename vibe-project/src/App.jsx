@@ -1,35 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.jsx
+import { useReducer, useState } from 'react';
+import { targets, getRank } from './data/targets.js';
+import Header from './components/Header.jsx';
+import Grid from './components/Grid.jsx';
+import Modal from './components/Modal.jsx';
 
-function App() {
-  const [count, setCount] = useState(0)
+/* ------------------------------------------------------------------ */
+/*  1.  SCORE STATE                                                   */
+/* ------------------------------------------------------------------ */
+const initialState = { score: 0 };
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'ADD_POINTS':
+      return { score: state.score + action.payload };
+    case 'RESET':
+      return initialState;
+    default:
+      return state;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  2.  APP COMPONENT                                                 */
+/* ------------------------------------------------------------------ */
+export default function App() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const [modalImg, setModalImg] = useState(null);   // for the image viewer
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      {/* header */}
+      <Header
+        score={state.score}
+        rank={getRank(state.score)}
+        onReset={() => dispatch({ type: 'RESET' })}
+      />
 
-export default App
+      {/* target grid */}
+      <Grid
+        targets={targets}
+        onClick={(xp) => dispatch({ type: 'ADD_POINTS', payload: xp })}
+        onView={setModalImg}                      // pass opener for modal
+      />
+
+      {/* full‑size image modal */}
+      <Modal imgSrc={modalImg} onClose={() => setModalImg(null)} />
+    </>
+  );
+}

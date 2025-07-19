@@ -1,0 +1,156 @@
+/*
+  app.css – Drone Ops Scoreboard UI  (v9)
+  • Centred auto‑fit grid
+  • 240 px image with zoom-icon overlay (20 % opacity)
+  • Header centred title; rank/xp + Clear All
+*/
+
+@import url("./variables.css");
+
+/* ---------- base ---------- */
+html, body { height: 100%; }
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  margin: 0;
+}
+
+/* ====================================================================
+   HEADER
+   ==================================================================== */
+.header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+.header__left { display: flex; gap: 1rem; align-items: center; }
+.header__rank, .header__score {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+}
+.header__title {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-heading);
+  font-size: 2rem; letter-spacing: 2px; pointer-events: none;
+}
+.header__reset {
+  background: var(--color-surface-alt);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-s);
+  padding: 0.55rem 1.1rem;
+  font-family: var(--font-heading);
+  font-size: 0.95rem; letter-spacing: 1px;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.4);
+}
+.header__reset:hover { background: #0e2738; }
+.header__reset:active { transform: scale(0.96); background: #091822; }
+
+/* ====================================================================
+   GRID
+   ==================================================================== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1.25rem;
+  padding: 1rem;
+  max-width: 1400px;
+  margin: auto; place-content: center;
+}
+
+/* ====================================================================
+   CARD
+   ==================================================================== */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  box-shadow: 0 3px 7px rgba(0,0,0,0.35);
+  transition: box-shadow var(--transition-fast);
+}
+.card:hover { box-shadow: 0 5px 12px rgba(0,0,0,0.45); }
+.card--horizontal { display: flex; }
+
+/* thumbnail container */
+.card__thumb { position: relative; }
+.card__img   { width: 240px; height: 100%; object-fit: cover; display: block; filter: brightness(0.9); }
+
+/* zoom icon overlay */
+.card__zoom {
+  position: absolute; top: 8px; right: 8px;
+  width: 28px; height: 28px;
+  opacity: 0.65;
+  cursor: pointer;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+.card__thumb:hover .card__zoom { opacity: 1; transform: scale(1.2); }
+
+.card__content { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; }
+.card__text    { flex: 1; }
+
+.card__title { font-family: var(--font-heading); font-size: 1.3rem; margin-bottom: 0.45rem; text-align: left; }
+.card__desc  { font-size: 1rem;  margin-bottom: 0.45rem; text-align: left; }
+.card__category { font-size: 0.85rem; color: var(--color-text-secondary); text-align: left; }
+
+.card__actions { display: flex; gap: 0.6rem; }
+
+/* ====================================================================
+   ACTION BUTTONS
+   ==================================================================== */
+.btn {
+  flex: 1; padding: 0.6rem 0; font-size: 0.95rem; font-weight: 600;
+  border-radius: var(--radius-s); border: 1px solid var(--color-border);
+  font-family: var(--font-heading); letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform var(--transition-fast), background 120ms ease-in;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35);
+}
+.btn:active { transform: scale(0.96); background: #9b2c2c; }
+
+.btn--kkill { background: var(--color-success); color: var(--color-text-primary); }
+.btn--mkill { background: var(--color-accent);  color: var(--color-text-primary); }
+
+@keyframes btnFlash {
+  0% { box-shadow: 0 0 0 2px var(--color-accent); }
+  100% { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35); }
+}
+.btn.flash { animation: btnFlash 250ms ease-out; }
+
+/* ---------- utility ---------- */
+.motion-scale { transition: transform var(--transition-fast); }
+.motion-scale:hover { transform: scale(1.04); }
+
+/* ====================================================================
+   MODAL
+   ==================================================================== */
+.modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 100;
+}
+.modal__dialog { position: relative; max-width: 90vw; max-height: 90vh; }
+.modal__dialog img { width: 100%; height: 100%; object-fit: contain;
+  border: 2px solid var(--color-border); border-radius: var(--radius-m); }
+.modal__close {
+  position: absolute; top: -14px; right: -14px; width: 32px; height: 32px;
+  border-radius: 50%; border: none; font-size: 1.2rem; font-weight: 600;
+  cursor: pointer; background: var(--color-warning); color: var(--color-bg);
+  box-shadow: 0 0 0 2px var(--color-border);
+}
+.modal__close:hover { filter: brightness(1.1); }
