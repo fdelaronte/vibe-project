@@ -1,21 +1,17 @@
 /* =====================================================================
-   app.css — SMASH COUNTER  (v18 · Rank‑Up overlay final, 1.5 s)
-   ---------------------------------------------------------------------
-   • v16 compact fonts, fixed sidebar, shadows remain.
-   • Rank‑Up overlay updated to match RankUpOverlay.jsx.
+   app.css — SMASH COUNTER (clean, responsive, two-line title on narrow)
    ===================================================================== */
 
 @import url("./variables.css");
 
-/* ---------- base --------------------------------------------------- */
-html,
-body {
+/* ---------- BASE ---------- */
+html, body {
   height: 100%;
 }
 
 body {
   margin: 0;
-  padding-right: 280px;            /* reserve sidebar space */
+  padding-right: 280px;  /* space for log sidebar */
   background: var(--color-bg);
   color: var(--color-text-primary);
   font-family: var(--font-body);
@@ -23,12 +19,7 @@ body {
   flex-direction: column;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   margin: 0;
   font-family: var(--font-heading);
 }
@@ -44,26 +35,43 @@ h6 {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   box-shadow: 0 7px 10px #000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
 }
 
+/* LEFT: Title */
 .header__left {
+  flex: 1 1 auto;
   display: flex;
-  gap: 1rem;
-  align-items: center;
+  align-items: flex-start;
 }
-
-.header__rank,
-.header__score {
-  font-family: var(--font-heading);
-  font-size: 1rem;
-  letter-spacing: 0.8px;
-}
-
 .header__title {
   font-size: 2.5rem;
   letter-spacing: 1.5px;
+  line-height: 1.05;
+}
+.header__title--one,
+.header__title--two {
+  display: inline;
 }
 
+/* RIGHT: Rank/XP and Button */
+.header__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  min-width: 140px;
+}
+.header__rankscore {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+}
 .header__reset {
   background: var(--color-surface-alt);
   color: var(--color-text-primary);
@@ -77,14 +85,8 @@ h6 {
   transition: background 0.15s, transform 0.15s;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
 }
-
-.header__reset:hover {
-  background: #0e2738;
-}
-.header__reset:active {
-  transform: scale(0.96);
-  background: #091822;
-}
+.header__reset:hover { background: #0e2738; }
+.header__reset:active { transform: scale(0.96); background: #091822; }
 
 /* ====================================================================
    GRID
@@ -98,6 +100,7 @@ h6 {
   max-width: 1400px;
   margin: 0 auto;
   box-sizing: border-box;
+  padding-top: 7.5rem;
 }
 
 /* ====================================================================
@@ -112,10 +115,7 @@ h6 {
   box-shadow: 0 7px 7px rgba(0, 0, 0, 0.7);
   transition: box-shadow 0.15s;
 }
-.card:hover {
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.45);
-}
-
+.card:hover { box-shadow: 0 5px 12px rgba(0, 0, 0, 0.45); }
 .card__thumb {
   position: relative;
   cursor: pointer;
@@ -140,7 +140,6 @@ h6 {
   opacity: 1;
   transform: scale(1.40);
 }
-
 .card__content {
   flex: 1;
   display: flex;
@@ -148,10 +147,7 @@ h6 {
   justify-content: space-between;
   padding: 0.9rem;
 }
-.card__text {
-  flex: 1;
-}
-
+.card__text { flex: 1; }
 .card__title {
   font-family: var(--font-heading);
   font-size: 1.1rem;
@@ -165,12 +161,7 @@ h6 {
   font-size: 0.75rem;
   color: var(--color-text-secondary);
 }
-
-.card__actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
+.card__actions { display: flex; gap: 0.5rem; }
 .btn {
   flex: 1;
   padding: 0.5rem 0;
@@ -184,48 +175,28 @@ h6 {
   transition: transform 0.15s, background 0.12s;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
 }
-.btn:active {
-  transform: scale(0.96);
-  background: #9b2c2c;
-}
-
-.btn--kkill {
-  background: var(--color-success);
-  color: var(--color-text-primary);
-}
-.btn--mkill {
-  background: var(--color-accent);
-  color: var(--color-text-primary);
-}
-
+.btn:active { transform: scale(0.96); background: #9b2c2c; }
+.btn--kkill { background: var(--color-success); color: var(--color-text-primary); }
+.btn--mkill { background: var(--color-accent); color: var(--color-text-primary); }
 @keyframes btnFlash {
-  0% {
-    box-shadow: 0 0 0 2px var(--color-accent);
-  }
-  100% {
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
-  }
+  0%   { box-shadow: 0 0 0 2px var(--color-accent);}
+  100% { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35);}
 }
-.btn.flash {
-  animation: btnFlash 0.25s ease-out;
-}
+.btn.flash { animation: btnFlash 0.25s ease-out; }
 
 /* ====================================================================
-   FIXED LOG SIDEBAR
+   LOG SIDEBAR
    ==================================================================== */
 .log {
   position: fixed;
-  right: 0;
-  top: 0;
-  bottom: 0;
+  right: 0; top: 0; bottom: 0;
   width: 280px;
   background: #000000;
-  box-shadow: 0 7px 10px #ffffff;
+  box-shadow: 0 7px 10px #222;
   display: flex;
   flex-direction: column;
   z-index: 1;
 }
-
 .log__title {
   margin: 0;
   padding: 0.6rem 1rem 0.6rem;
@@ -235,26 +206,25 @@ h6 {
   color: #fff;
   border-bottom: 1px solid rgba(255,255,255,0.15);
 }
-
 /* bullet + indentation for each log line */
 .log__line {
   position: relative;
-  padding-left: 0.9rem;      /* indent text */
+  padding-left: 0.9rem;
+  word-break: break-word;
+  line-height: 1.25;
 }
 .log__line::before {
-  content: "›";                   /* or ">" if you prefer */
+  content: "›";
   position: absolute;
-  left: 0;                    /* ⬅️  down‑shifts bullet ~2‑3 px */
-  color: #ffffff;                 /* neon green bullet */
-  font-size: 1rem;
-  line-height: 1;                 /* keeps glyph compact */
+  left: 0;
+  top: 0.15em;
+  color: #00ff88;
+  font-size: 0.85rem;
+  line-height: 1;
 }
-
-/* coloured result tags in SMASH LOG */
-.log-kill--k { color: #ff4040; }    /* red for K‑Kill */
-.log-kill--m { color: #ffa500; }    /* orange for M‑Kill */
-
-
+/* coloured result tags */
+.log-kill--k { color: #ff4040; }
+.log-kill--m { color: #ffa500; }
 .log__list {
   flex: 1;
   margin: 0;
@@ -270,20 +240,11 @@ h6 {
   letter-spacing: 0.4px;
   overflow-wrap: anywhere;
 }
-.log__line {
-  word-break: break-word;
-}
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
-}
-.log__cursor {
-  animation: blink 1s steps(1) infinite;
-}
+@keyframes blink { 50% { opacity: 0; } }
+.log__cursor { animation: blink 1s steps(1) infinite; }
 
 /* ====================================================================
-   RANK‑UP OVERLAY (3 s)
+   RANK-UP OVERLAY
    ==================================================================== */
 .rank-overlay {
   position: fixed;
@@ -295,36 +256,21 @@ h6 {
   align-items: center;
   pointer-events: none;
   z-index: 200;
-  animation: fadeOut 3s forwards;
+  animation: fadeOut 1.5s forwards;
 }
 @keyframes fadeOut {
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
 }
-
 .rank-blast {
   text-align: center;
   animation: popIn 1s ease-out;
 }
 @keyframes popIn {
-  0% {
-    transform: scale(4);
-    opacity: 0;
-  }
-  70% {
-    transform: scale(0.9);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0%   { transform: scale(4); opacity: 0; }
+  70%  { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
-
 .rank-label {
   display: block;
   font-size: 0.9rem;
@@ -341,12 +287,7 @@ h6 {
   text-shadow: 0 0 15px #ffbf00;
   margin: 0;
 }
-@keyframes flash {
-  50% {
-    opacity: 0.25;
-  }
-}
-
+@keyframes flash { 50% { opacity: 0.25; } }
 /* shockwave ring */
 .rank-shockwave {
   position: absolute;
@@ -358,10 +299,7 @@ h6 {
   animation: wave 1.2s ease-out forwards;
 }
 @keyframes wave {
-  to {
-    transform: scale(3.2);
-    opacity: 0;
-  }
+  to { transform: scale(3.2); opacity: 0; }
 }
 
 /* ====================================================================
@@ -404,14 +342,87 @@ h6 {
   color: var(--color-bg);
   box-shadow: 0 0 0 2px var(--color-border);
 }
-.modal__close:hover {
-  filter: brightness(1.1);
+.modal__close:hover { filter: brightness(1.1); }
+
+/* ---------- UTILITY ---------- */
+.motion-scale { transition: transform 0.15s; }
+.motion-scale:hover { transform: scale(1.04); }
+
+/* ====================================================================
+   RESPONSIVE — below 1250px
+   ==================================================================== */
+@media (max-width: 1250px) {
+  .log {
+    display: none !important;
+  }
+  body {
+    padding-right: 0 !important;
+  }
+  .header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header__left {
+    flex: 1 1 auto;
+    align-items: flex-start;
+  }
+  .header__title {
+    font-size: 2.1rem;
+    letter-spacing: 1.1px;
+    line-height: 1.08;
+  }
+  .header__title--one,
+  .header__title--two {
+    display: block;
+    width: 100%;
+  }
+  .header__right {
+    align-items: flex-end;
+    gap: 0.2rem;
+  }
 }
 
-/* ---------- utility ----------------------------------------------- */
-.motion-scale {
-  transition: transform 0.15s;
+@media (max-width: 580px) {
+  .card {
+    flex-direction: column;
+    min-width: 0;
+    border-radius: var(--radius-s);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  }
+  .card__img {
+    width: 100%;
+    height: 140px;
+    max-width: 100%;
+    object-fit: cover;
+  }
+  .card__content {
+    padding: 0.5rem 0.7rem 0.7rem 0.7rem;
+  }
+  .card__title {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+  .card__desc {
+    font-size: 0.7rem;
+    margin-bottom: 0.2rem;
+  }
+  .card__category {
+    font-size: 0.6rem;
+  }
+  .btn {
+    font-size: 0.75rem;
+    padding: 0.4rem 0;
+  }
 }
-.motion-scale:hover {
-  transform: scale(1.04);
+
+@media (max-width: 580px) {
+  .grid {
+    grid-template-columns: 1fr;  /* stack one per row */
+    
+    gap: 0.6rem;
+  }
 }
+
+
+/* ==================================================================== */
