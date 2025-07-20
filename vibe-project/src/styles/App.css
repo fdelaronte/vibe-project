@@ -212,14 +212,15 @@ h1, h2, h3, h4, h5, h6 {
   padding-left: 0.9rem;
   word-break: break-word;
   line-height: 1.25;
+  font-size: 1rem;
 }
 .log__line::before {
   content: "›";
   position: absolute;
   left: 0;
   top: 0.15em;
-  color: #00ff88;
-  font-size: 0.85rem;
+  color: #ffffff;
+  font-size: 1rem;
   line-height: 1;
 }
 /* coloured result tags */
